@@ -3,19 +3,34 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { useInterview } from "@/context/interview-provider";
 import { SKILL_SUGGESTIONS } from "@/lib/skills";
 import { Command } from "cmdk";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function SkillsSelection() {
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState("");
   const router = useRouter();
 
+  const {
+    selectedSkills,
+    setSelectedSkills,
+    inputValue,
+    setInputValue,
+    numQuestions,
+    setNumQuestions,
+    interviewLevel,
+    setInterviewLevel,
+  } = useInterview();
+
   const filteredSuggestions = SKILL_SUGGESTIONS.filter(
-    (skill) =>
+    (skill: string) =>
       skill.toLowerCase().includes(inputValue.toLowerCase()) &&
       !selectedSkills.includes(skill)
   );
@@ -35,7 +50,7 @@ export default function SkillsSelection() {
 
   const handleSubmit = () => {
     if (selectedSkills.length > 0) {
-      router.push("/interview");
+      router.push(`/interview`);
     }
   };
 
@@ -52,7 +67,7 @@ export default function SkillsSelection() {
           <h1 className="text-2xl font-bold mb-6">Select Your Skills</h1>
           <div className="space-y-4">
             <div className="relative">
-              <Command className="relative">
+              <Command>
                 <input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
@@ -88,6 +103,37 @@ export default function SkillsSelection() {
                   </button>
                 </Badge>
               ))}
+            </div>
+
+            <div className="space-y-4">
+              <Select
+                value={numQuestions.toString()}
+                onValueChange={(value) => setNumQuestions(Number(value))}
+              >
+                <SelectTrigger className="w-full">
+                  <span>{numQuestions} Questions</span>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5 Questions</SelectItem>
+                  <SelectItem value="10">10 Questions</SelectItem>
+                  <SelectItem value="15">15 Questions</SelectItem>
+                  <SelectItem value="20">20 Questions</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={interviewLevel}
+                onValueChange={(value) => setInterviewLevel(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <span>{interviewLevel}</span>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="basic">Basic</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="hard">Hard</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <Button

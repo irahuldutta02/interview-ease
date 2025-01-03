@@ -1,14 +1,13 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { useInterview } from "@/context/interview-provider";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const { name, setName, email, setEmail } = useInterview();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary">
