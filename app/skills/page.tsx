@@ -136,8 +136,8 @@ export default function SkillsSelection() {
                   <span>{interviewLevel}</span>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Basic">Basic</SelectItem>
-                  <SelectItem value="Intermediate">Intermediate</SelectItem>
+                  <SelectItem value="Easy">Easy</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
                   <SelectItem value="Hard">Hard</SelectItem>
                 </SelectContent>
               </Select>

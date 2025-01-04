@@ -24,7 +24,8 @@ const schema = {
       },
       question: {
         type: SchemaType.STRING,
-        description: "The interview question",
+        description:
+          "The interview question each question should be unique each time",
         nullable: false,
       },
     },
@@ -35,13 +36,7 @@ const schema = {
 export async function POST(req: Request): Promise<Response> {
   try {
     const body: GenerateQuestionsRequest = await req.json();
-    const {
-      name,
-      email,
-      numQuestions = 5,
-      interviewLevel,
-      selectedSkills,
-    } = body;
+    const { numQuestions = 5, interviewLevel, selectedSkills } = body;
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
     const model = genAI.getGenerativeModel({
@@ -52,21 +47,18 @@ export async function POST(req: Request): Promise<Response> {
       },
     });
 
-    console.log("Inside the generate questions route");
-    console.log({
-      name,
-      email,
-      numQuestions,
-      interviewLevel,
-      selectedSkills,
-    });
-
     // Create the dynamic prompt for Gemini
     const prompt = `
-      Generate ${numQuestions} challenging interview questions for a(n) ${interviewLevel} level candidate.
+      Generate ${numQuestions} unique and challenging interview questions for a ${interviewLevel} level candidate.
       The candidate's skills include: ${selectedSkills.join(", ")}.
+      The questions should be:
+      - Tailored to the candidate's skills and experience.
+      - Relevant for an oral interview (i.e., questions that assess knowledge and problem-solving in spoken form).
+      - Unique and not repetitive across requests.
+      - Designed to assess both technical and problem-solving abilities in the selected skills.
+      - Engaging, thought-provoking, and appropriate for the experience level specified.
+      - Avoid theoretical or overly broad questions; focus on practical, real-world applications where possible.
     `;
-    console.log({ prompt });
 
     // Get the structured response from Gemini
     const result = await model.generateContent(prompt);

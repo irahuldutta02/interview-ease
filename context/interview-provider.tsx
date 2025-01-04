@@ -42,7 +42,7 @@ export const InterviewProvider: React.FC<InterviewProviderProps> = ({
     "TypeScript",
   ]);
   const [numQuestions, setNumQuestions] = useState<number>(5);
-  const [interviewLevel, setInterviewLevel] = useState<string>("Basic");
+  const [interviewLevel, setInterviewLevel] = useState<string>("Easy");
 
   return (
     <InterviewContext.Provider

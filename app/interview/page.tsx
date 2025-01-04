@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useInterview } from "@/context/interview-provider";
 import { useGetQuestion } from "@/hooks/use-get-question";
+import useSpeechRecognition from "@/hooks/use-speech-recognition";
 import {
   House,
   Mic,
@@ -36,38 +37,44 @@ export default function InterviewPage() {
     redirect("/");
   }
 
-  console.log({ name, email, selectedSkills, numQuestions, interviewLevel });
-
   const { allQuestions, setAllQuestions, refetch, loading, error } =
     useGetQuestion(name, email, numQuestions, interviewLevel, selectedSkills);
-
-  console.log({ allQuestions });
 
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [isRecording, setIsRecording] = useState(false);
 
-  const handleNextQuestion = () => {
-    setCurrentQuestion((prev) => prev + 1);
-  };
-
   const handleRegenerate = () => {
+    setIsRecording(false);
     refetch();
     setCurrentQuestion(1);
   };
 
+  const handleNextQuestion = () => {
+    setIsRecording(false);
+    setCurrentQuestion((prev) => prev + 1);
+  };
+
   const handlePreviousQuestion = () => {
+    setIsRecording(false);
     setCurrentQuestion((prev) => prev - 1);
   };
 
   const toggleRecording = () => {
     setIsRecording(!isRecording);
-    // Here you would implement actual voice recording logic
   };
 
   const handleSubmit = () => {
-    // Here you would implement the answer submission logic
+    setIsRecording(false);
     console.log(allQuestions);
   };
+
+  useSpeechRecognition({
+    isRecording,
+    setIsRecording,
+    allQuestions,
+    currentQuestion,
+    setAllQuestions,
+  });
 
   if (loading) {
     return (
@@ -199,17 +206,15 @@ export default function InterviewPage() {
   }
 
   if (!loading && !error && allQuestions.length > 0) {
-    console.log({ allQuestions });
-
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary p-4">
         <div className="max-w-3xl mx-auto pt-16">
           <Card className="p-6">
             <div className="mb-8">
-              <h2 className="text-xl font-semibold text-muted-foreground mb-2">
+              <h2 className="text-xs sm:text-lg font-semibold text-muted-foreground mb-2">
                 Question {currentQuestion} of {allQuestions.length}
               </h2>
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-sm sm:text-xl font-bold">
                 {allQuestions.find((q) => q.id === currentQuestion)?.question}
               </h1>
             </div>
