@@ -9,8 +9,6 @@ interface InterviewContextProps {
   setEmail: (email: string) => void;
   selectedSkills: string[];
   setSelectedSkills: (skills: string[]) => void;
-  inputValue: string;
-  setInputValue: (inputValue: string) => void;
   numQuestions: number;
   setNumQuestions: (numQuestions: number) => void;
   interviewLevel: string;
@@ -40,9 +38,8 @@ export const InterviewProvider: React.FC<InterviewProviderProps> = ({
   const [email, setEmail] = useState("");
 
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState<string>("");
   const [numQuestions, setNumQuestions] = useState<number>(5);
-  const [interviewLevel, setInterviewLevel] = useState<string>("basic");
+  const [interviewLevel, setInterviewLevel] = useState<string>("Basic");
 
   return (
     <InterviewContext.Provider
@@ -53,8 +50,6 @@ export const InterviewProvider: React.FC<InterviewProviderProps> = ({
         setEmail,
         selectedSkills,
         setSelectedSkills,
-        inputValue,
-        setInputValue,
         numQuestions,
         setNumQuestions,
         interviewLevel,

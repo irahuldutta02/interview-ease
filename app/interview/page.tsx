@@ -3,7 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { useInterview } from "@/context/interview-provider";
 import { Mic, MicOff, Send, SquareArrowRight } from "lucide-react";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 
 type Questions = {
@@ -16,6 +18,19 @@ type Questions = {
 };
 
 export default function InterviewPage() {
+  const { name, email, selectedSkills, numQuestions, interviewLevel } =
+    useInterview();
+
+  if (
+    !name ||
+    !email ||
+    !numQuestions ||
+    !interviewLevel ||
+    selectedSkills.length === 0
+  ) {
+    redirect("/");
+  }
+
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [allQuestions, setAllQuestions] = useState<Questions[]>([
     {

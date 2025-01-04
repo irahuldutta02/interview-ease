@@ -13,21 +13,28 @@ import { useInterview } from "@/context/interview-provider";
 import { SKILL_SUGGESTIONS } from "@/lib/skills";
 import { Command } from "cmdk";
 import { X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SkillsSelection() {
-  const router = useRouter();
-
   const {
+    name,
+    email,
     selectedSkills,
     setSelectedSkills,
-    inputValue,
-    setInputValue,
     numQuestions,
     setNumQuestions,
     interviewLevel,
     setInterviewLevel,
   } = useInterview();
+
+  if (!name || !email) {
+    redirect("/");
+  }
+
+  const router = useRouter();
+
+  const [inputValue, setInputValue] = useState<string>("");
 
   const filteredSuggestions = SKILL_SUGGESTIONS.filter(
     (skill: string) =>
@@ -129,9 +136,9 @@ export default function SkillsSelection() {
                   <span>{interviewLevel}</span>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="basic">Basic</SelectItem>
-                  <SelectItem value="intermediate">Intermediate</SelectItem>
-                  <SelectItem value="hard">Hard</SelectItem>
+                  <SelectItem value="Basic">Basic</SelectItem>
+                  <SelectItem value="Intermediate">Intermediate</SelectItem>
+                  <SelectItem value="Hard">Hard</SelectItem>
                 </SelectContent>
               </Select>
             </div>
