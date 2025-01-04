@@ -1,9 +1,10 @@
+import HomeButton from "@/components/custom/HomeButton";
 import { ModeToggle } from "@/components/custom/ModeToggle";
+import { InterviewProvider } from "@/context/interview-provider";
 import { ThemeProvider } from "@/context/theme-provider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { InterviewProvider } from "@/context/interview-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <InterviewProvider>
+            <div className="fixed top-4 left-4 z-50">
+              <HomeButton />
+            </div>
             <div className="fixed top-4 right-4 z-50">
               <ModeToggle />
             </div>
