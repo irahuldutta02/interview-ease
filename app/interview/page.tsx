@@ -1,5 +1,6 @@
 "use client";
 
+import Report from "@/components/custom/Report";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,6 +43,7 @@ export default function InterviewPage() {
 
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [isRecording, setIsRecording] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleRegenerate = () => {
     setIsRecording(false);
@@ -66,6 +68,7 @@ export default function InterviewPage() {
   const handleSubmit = () => {
     setIsRecording(false);
     console.log(allQuestions);
+    setSubmitted(true);
   };
 
   useSpeechRecognition({
@@ -208,130 +211,134 @@ export default function InterviewPage() {
   if (!loading && !error && allQuestions.length > 0) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary p-4">
-        <div className="max-w-3xl mx-auto pt-16">
-          <Card className="p-6">
-            <div className="mb-8">
-              <h2 className="text-xs sm:text-lg font-semibold text-muted-foreground mb-2">
-                Question {currentQuestion} of {allQuestions.length}
-              </h2>
-              <h1 className="text-sm sm:text-xl font-bold">
-                {allQuestions.find((q) => q.id === currentQuestion)?.question}
-              </h1>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Button
-                  variant={isRecording ? "destructive" : "secondary"}
-                  onClick={toggleRecording}
-                  className="flex items-center gap-2"
-                >
-                  {isRecording ? (
-                    <>
-                      <MicOff className="h-4 w-4" />
-                      Stop Recording
-                    </>
-                  ) : (
-                    <>
-                      <Mic className="h-4 w-4" />
-                      Start Recording
-                    </>
-                  )}
-                </Button>
-                {isRecording && (
-                  <div className="flex items-center gap-2">
-                    <span className="animate-pulse text-destructive">●</span>
-                    <span className="text-sm text-muted-foreground">
-                      Recording...
-                    </span>
-                  </div>
-                )}
+        {!submitted && (
+          <div className="max-w-3xl mx-auto pt-16">
+            <Card className="p-6">
+              <div className="mb-8">
+                <h2 className="text-xs sm:text-lg font-semibold text-muted-foreground mb-2">
+                  Question {currentQuestion} of {allQuestions.length}
+                </h2>
+                <h1 className="text-sm sm:text-xl font-bold">
+                  {allQuestions.find((q) => q.id === currentQuestion)?.question}
+                </h1>
               </div>
 
-              <Textarea
-                value={allQuestions[currentQuestion - 1]?.answer || ""}
-                onChange={(e) => {
-                  const updatedQuestions = allQuestions.map((q) =>
-                    q.id === currentQuestion
-                      ? { ...q, answer: e.target.value }
-                      : q
-                  );
-                  setAllQuestions(updatedQuestions);
-                }}
-                disabled={isRecording}
-                placeholder="Type your answer here..."
-                className="min-h-[200px] resize-none"
-              />
-
-              <div className="flex justify-end gap-4 flex-wrap">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={handleRegenerate}
-                        className="flex items-center gap-2"
-                        variant="destructive"
-                      >
-                        <RotateCcw className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Regenerate All Questions</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                {currentQuestion > 1 && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={handlePreviousQuestion}
-                          className="flex items-center gap-2"
-                        >
-                          <SquareArrowRight className="h-4 w-4 transform rotate-180" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Previous Question</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-
-                {currentQuestion < allQuestions.length && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={handleNextQuestion}
-                          className="flex items-center gap-2"
-                          disabled={!allQuestions[currentQuestion - 1].answer}
-                        >
-                          <SquareArrowRight className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Next Question</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                {currentQuestion === allQuestions.length && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
                   <Button
-                    variant="secondary"
-                    onClick={handleSubmit}
+                    variant={isRecording ? "destructive" : "secondary"}
+                    onClick={toggleRecording}
                     className="flex items-center gap-2"
-                    disabled={!allQuestions[currentQuestion - 1].answer}
                   >
-                    Submit Answer
-                    <Send className="h-4 w-4" />
+                    {isRecording ? (
+                      <>
+                        <MicOff className="h-4 w-4" />
+                        Stop Recording
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="h-4 w-4" />
+                        Start Recording
+                      </>
+                    )}
                   </Button>
-                )}
+                  {isRecording && (
+                    <div className="flex items-center gap-2">
+                      <span className="animate-pulse text-destructive">●</span>
+                      <span className="text-sm text-muted-foreground">
+                        Recording...
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <Textarea
+                  value={allQuestions[currentQuestion - 1]?.answer || ""}
+                  onChange={(e) => {
+                    const updatedQuestions = allQuestions.map((q) =>
+                      q.id === currentQuestion
+                        ? { ...q, answer: e.target.value }
+                        : q
+                    );
+                    setAllQuestions(updatedQuestions);
+                  }}
+                  disabled={isRecording}
+                  placeholder="Type your answer here..."
+                  className="min-h-[200px] resize-none"
+                />
+
+                <div className="flex justify-end gap-4 flex-wrap">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={handleRegenerate}
+                          className="flex items-center gap-2"
+                          variant="destructive"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Regenerate All Questions</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  {currentQuestion > 1 && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            onClick={handlePreviousQuestion}
+                            className="flex items-center gap-2"
+                          >
+                            <SquareArrowRight className="h-4 w-4 transform rotate-180" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Previous Question</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+
+                  {currentQuestion < allQuestions.length && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            onClick={handleNextQuestion}
+                            className="flex items-center gap-2"
+                            disabled={!allQuestions[currentQuestion - 1].answer}
+                          >
+                            <SquareArrowRight className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Next Question</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                  {currentQuestion === allQuestions.length && (
+                    <Button
+                      variant="secondary"
+                      onClick={handleSubmit}
+                      className="flex items-center gap-2"
+                      disabled={!allQuestions[currentQuestion - 1].answer}
+                    >
+                      Submit Answer
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          </Card>
-        </div>
+            </Card>
+          </div>
+        )}
+
+        {submitted && <Report allQuestions={allQuestions} />}
       </div>
     );
   }
