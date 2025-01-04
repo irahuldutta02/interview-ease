@@ -3,6 +3,6 @@ export type Questions = {
   question: string;
   answer?: string;
   idealAnswer?: string;
-  mark?: number;
-  outOf?: number;
+  score?: number;
+  feedback?: string;
 };

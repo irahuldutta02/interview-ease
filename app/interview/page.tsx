@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useInterview } from "@/context/interview-provider";
+import { useEvaluateAnswer } from "@/hooks/use-evaluate-answer";
 import { useGetQuestion } from "@/hooks/use-get-question";
 import useSpeechRecognition from "@/hooks/use-speech-recognition";
 import {
@@ -41,6 +42,14 @@ export default function InterviewPage() {
   const { allQuestions, setAllQuestions, refetch, loading, error } =
     useGetQuestion(numQuestions, interviewLevel, selectedSkills);
 
+  const {
+    evaluatedAnswers,
+    evaluateAnswers,
+    setEvaluatedAnswers,
+    loading: evaluationLoading,
+    error: evaluationError,
+  } = useEvaluateAnswer(allQuestions);
+
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [isRecording, setIsRecording] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -65,10 +74,18 @@ export default function InterviewPage() {
     setIsRecording(!isRecording);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsRecording(false);
-    console.log(allQuestions);
     setSubmitted(true);
+    await evaluateAnswers();
+  };
+
+  const handleMoreQuestions = () => {
+    setSubmitted(false);
+    setAllQuestions([]);
+    setEvaluatedAnswers([]);
+    setCurrentQuestion(1);
+    refetch();
   };
 
   useSpeechRecognition({
@@ -93,15 +110,15 @@ export default function InterviewPage() {
 
             <div className="space-y-6">
               {/* Recording Button Placeholder */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between animate-pulse">
                 <div className="h-10 w-40 bg-muted-foreground rounded"></div>
               </div>
 
               {/* Answer Textarea Placeholder */}
-              <div className="h-48 bg-muted-foreground rounded"></div>
+              <div className="h-48 bg-muted-foreground rounded animate-pulse"></div>
 
               {/* Navigation Buttons Placeholder */}
-              <div className="flex justify-end gap-4 flex-wrap">
+              <div className="flex justify-end gap-4 flex-wrap animate-pulse">
                 <div className="h-10 w-32 bg-muted-foreground rounded"></div>
               </div>
             </div>
@@ -338,7 +355,82 @@ export default function InterviewPage() {
           </div>
         )}
 
-        {submitted && <Report allQuestions={allQuestions} />}
+        {submitted && evaluationLoading && (
+          <>
+            {Array.from({ length: numQuestions }).map((_, index) => (
+              <div
+                key={index}
+                className="max-w-3xl mx-auto pt-12 animate-pulse"
+              >
+                <Card key={index} className="p-6 mb-4">
+                  <div className="mb-8">
+                    <div className="h-4 w-1/3 bg-gray-300 rounded mb-2"></div>{" "}
+                    {/* Question number */}
+                    <div className="h-6 w-1/2 bg-gray-300 rounded"></div>{" "}
+                    {/* Question text */}
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="h-4 w-1/4 bg-yellow-200 rounded"></div>{" "}
+                    {/* Your Answer label */}
+                    <div className="h-6 w-full bg-gray-200 rounded"></div>{" "}
+                    {/* Placeholder for Your Answer */}
+                  </div>
+
+                  <div className="space-y-4 mt-2">
+                    <div className="h-4 w-1/4 bg-green-200 rounded"></div>{" "}
+                    {/* Ideal Answer label */}
+                    <div className="h-6 w-full bg-gray-200 rounded"></div>{" "}
+                    {/* Placeholder for Ideal Answer */}
+                  </div>
+
+                  <div className="space-y-4 mt-2">
+                    <div className="h-4 w-1/4 bg-blue-200 rounded"></div>{" "}
+                    {/* Ideal Answer label */}
+                    <div className="h-6 w-full bg-gray-200 rounded"></div>{" "}
+                    {/* Placeholder for Ideal Answer */}
+                  </div>
+                </Card>
+              </div>
+            ))}
+          </>
+        )}
+
+        {submitted && !evaluationLoading && evaluationError && (
+          <div className="max-w-3xl mx-auto pt-16">
+            <Card className="p-6 min-h-96 flex flex-col justify-center items-center">
+              <h1 className="text-2xl font-bold text-center text-destructive">
+                Error evaluating answers
+              </h1>
+              <p className="text-center text-muted-foreground">
+                {evaluationError}
+              </p>
+              <div className="flex justify-center mt-4 gap-3">
+                <Button
+                  className="flex items-center gap-2"
+                  onClick={() => evaluateAnswers()}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Retry
+                </Button>
+                <Button
+                  className="flex items-center gap-2"
+                  onClick={() => redirect("/")}
+                >
+                  <House className="h-4 w-4" />
+                  Home
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {submitted && !evaluationLoading && !evaluationError && (
+          <Report
+            evaluatedAnswers={evaluatedAnswers}
+            handleMoreQuestions={handleMoreQuestions}
+          />
+        )}
       </div>
     );
   }
