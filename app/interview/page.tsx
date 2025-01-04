@@ -13,7 +13,7 @@ import {
 import { useInterview } from "@/context/interview-provider";
 import { useEvaluateAnswer } from "@/hooks/use-evaluate-answer";
 import { useGetQuestion } from "@/hooks/use-get-question";
-import useSpeechRecognition from "@/hooks/use-speech-recognition";
+import { useToast } from "@/hooks/use-toast";
 import {
   House,
   Mic,
@@ -23,11 +23,15 @@ import {
   SquareArrowRight,
 } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 export default function InterviewPage() {
   const { name, email, selectedSkills, numQuestions, interviewLevel } =
     useInterview();
+  const { toast } = useToast();
 
   if (
     !name ||
@@ -51,31 +55,31 @@ export default function InterviewPage() {
   } = useEvaluateAnswer(allQuestions);
 
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [isRecording, setIsRecording] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleRegenerate = () => {
-    setIsRecording(false);
     refetch();
     setCurrentQuestion(1);
   };
 
   const handleNextQuestion = () => {
-    setIsRecording(false);
     setCurrentQuestion((prev) => prev + 1);
   };
 
   const handlePreviousQuestion = () => {
-    setIsRecording(false);
     setCurrentQuestion((prev) => prev - 1);
   };
 
   const toggleRecording = () => {
-    setIsRecording(!isRecording);
+    if (listening) {
+      SpeechRecognition.stopListening();
+    } else {
+      SpeechRecognition.startListening();
+      resetTranscript();
+    }
   };
 
   const handleSubmit = async () => {
-    setIsRecording(false);
     setSubmitted(true);
     await evaluateAnswers();
   };
@@ -88,13 +92,35 @@ export default function InterviewPage() {
     refetch();
   };
 
-  useSpeechRecognition({
-    isRecording,
-    setIsRecording,
-    allQuestions,
-    currentQuestion,
-    setAllQuestions,
-  });
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  useEffect(() => {
+    const updatedQuestions = allQuestions.map((q) =>
+      q.id === currentQuestion
+        ? {
+            ...q,
+            answer: q.answer ? q.answer + " " + transcript : transcript,
+          }
+        : q
+    );
+    setAllQuestions(updatedQuestions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcript]);
+
+  useEffect(() => {
+    if (!browserSupportsSpeechRecognition) {
+      toast({
+        title: "Error Recognizing Speech",
+        description: "Browser does not support speech recognition",
+        variant: "destructive",
+      });
+    }
+  }, [browserSupportsSpeechRecognition, toast]);
 
   if (loading) {
     return (
@@ -243,11 +269,11 @@ export default function InterviewPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Button
-                    variant={isRecording ? "destructive" : "secondary"}
+                    variant={listening ? "destructive" : "secondary"}
                     onClick={toggleRecording}
                     className="flex items-center gap-2"
                   >
-                    {isRecording ? (
+                    {listening ? (
                       <>
                         <MicOff className="h-4 w-4" />
                         Stop Recording
@@ -259,7 +285,7 @@ export default function InterviewPage() {
                       </>
                     )}
                   </Button>
-                  {isRecording && (
+                  {listening && (
                     <div className="flex items-center gap-2">
                       <span className="animate-pulse text-destructive">●</span>
                       <span className="text-sm text-muted-foreground">
@@ -279,7 +305,7 @@ export default function InterviewPage() {
                     );
                     setAllQuestions(updatedQuestions);
                   }}
-                  disabled={isRecording}
+                  disabled={listening}
                   placeholder="Type your answer here..."
                   className="min-h-[200px] resize-none"
                 />

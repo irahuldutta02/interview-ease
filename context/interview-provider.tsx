@@ -34,12 +34,15 @@ interface InterviewProviderProps {
 export const InterviewProvider: React.FC<InterviewProviderProps> = ({
   children,
 }) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("Rahul Dutta");
+  const [email, setEmail] = useState("rdtech2002@gmail.com");
 
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([
+    "JavaScript",
+    "TypeScript",
+  ]);
   const [numQuestions, setNumQuestions] = useState<number>(5);
-  const [interviewLevel, setInterviewLevel] = useState<string>("Easy");
+  const [interviewLevel, setInterviewLevel] = useState<string>("Basic");
 
   return (
     <InterviewContext.Provider
