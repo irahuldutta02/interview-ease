@@ -39,7 +39,7 @@ export default function InterviewPage() {
   }
 
   const { allQuestions, setAllQuestions, refetch, loading, error } =
-    useGetQuestion(name, email, numQuestions, interviewLevel, selectedSkills);
+    useGetQuestion(numQuestions, interviewLevel, selectedSkills);
 
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [isRecording, setIsRecording] = useState(false);

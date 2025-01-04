@@ -2,6 +2,8 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
 // Define the types for the request body
 interface GenerateQuestionsRequest {
+  name: string;
+  email: string;
   numQuestions?: number;
   interviewLevel: string;
   selectedSkills: string[];

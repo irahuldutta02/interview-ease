@@ -5,8 +5,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export const useGetQuestion = (
-  name: string,
-  email: string,
   numQuestions: number,
   interviewLevel: string,
   selectedSkills: string[]
@@ -17,12 +15,10 @@ export const useGetQuestion = (
 
   const refetch = async () => {
     try {
-      setError(null);
       setLoading(true);
+      setError(null);
 
       const res = await axios.post("/api/generate-questions", {
-        name,
-        email,
         numQuestions,
         interviewLevel,
         selectedSkills,
