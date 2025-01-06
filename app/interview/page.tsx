@@ -1,5 +1,10 @@
 "use client";
 
+import EvaluationError from "@/components/custom/EvaluationErrror";
+import EvaluationLoader from "@/components/custom/EvaluationLoader";
+import NoQuestionError from "@/components/custom/NoQuestionError";
+import QuestionError from "@/components/custom/QuestionError";
+import QuestionLoading from "@/components/custom/QuestionLoading";
 import Report from "@/components/custom/Report";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -96,99 +101,15 @@ export default function InterviewPage() {
   });
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary p-4">
-        <div className="max-w-3xl mx-auto pt-16">
-          <Card className="p-6">
-            <div className="mb-8 space-y-4 animate-pulse">
-              {/* Question Progress Placeholder */}
-              <div className="h-5 w-32 bg-muted-foreground rounded"></div>
-              {/* Question Title Placeholder */}
-              <div className="h-8 w-full bg-muted-foreground rounded"></div>
-            </div>
-
-            <div className="space-y-6">
-              {/* Recording Button Placeholder */}
-              <div className="flex items-center justify-between animate-pulse">
-                <div className="h-10 w-40 bg-muted-foreground rounded"></div>
-              </div>
-
-              {/* Answer Textarea Placeholder */}
-              <div className="h-48 bg-muted-foreground rounded animate-pulse"></div>
-
-              {/* Navigation Buttons Placeholder */}
-              <div className="flex justify-end gap-4 flex-wrap animate-pulse">
-                <div className="h-10 w-32 bg-muted-foreground rounded"></div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
+    return <QuestionLoading />;
   }
 
   if (!loading && error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary p-4">
-        <div className="max-w-3xl mx-auto pt-16">
-          <Card className="p-6 min-h-96 flex flex-col justify-center items-center">
-            <h1 className="text-2xl font-bold text-center text-destructive">
-              Error fetching questions
-            </h1>
-            <p className="text-center text-muted-foreground">{error}</p>
-            <div className="flex justify-center mt-4 gap-3">
-              <Button
-                className="flex items-center gap-2"
-                onClick={() => refetch()}
-              >
-                <RotateCcw className="h-4 w-4" />
-                Retry
-              </Button>
-              <Button
-                className="flex items-center gap-2"
-                onClick={() => redirect("/")}
-              >
-                <House className="h-4 w-4" />
-                Home
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
+    return <QuestionError error={error} refetch={refetch} />;
   }
 
   if (!loading && !error && !allQuestions) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary p-4">
-        <div className="max-w-3xl mx-auto pt-16">
-          <Card className="p-6 min-h-96 flex flex-col justify-center items-center">
-            <h1 className="text-2xl font-bold text-center">
-              No questions found
-            </h1>
-            <p className="text-center text-muted-foreground">
-              Please try again later
-            </p>
-            <div className="flex justify-center mt-4 gap-3">
-              <Button
-                className="flex items-center gap-2"
-                onClick={() => refetch()}
-              >
-                <RotateCcw className="h-4 w-4" />
-                Retry
-              </Button>
-              <Button
-                className="flex items-center gap-2"
-                onClick={() => redirect("/")}
-              >
-                <House className="h-4 w-4" />
-                Home
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </div>
-    );
+    return <NoQuestionError refetch={refetch} />;
   }
 
   if (!loading && !error && allQuestions.length === 0) {
@@ -325,7 +246,7 @@ export default function InterviewPage() {
                   {currentQuestion === allQuestions.length && (
                     <Button
                       variant="secondary"
-                      onClick={handleSubmit}
+                      onClick={handleSubmit || evaluationLoading}
                       className="flex items-center gap-2"
                       disabled={!allQuestions[currentQuestion - 1].answer}
                     >
@@ -339,67 +260,10 @@ export default function InterviewPage() {
           </div>
         )}
 
-        {submitted && evaluationLoading && (
-          <>
-            {Array.from({ length: numQuestions }).map((_, index) => (
-              <div
-                key={index}
-                className="max-w-3xl mx-auto pt-12 animate-pulse"
-              >
-                <Card key={index} className="p-6 mb-4">
-                  <div className="mb-8">
-                    <div className="h-4 w-1/3 bg-gray-300 rounded mb-2"></div>{" "}
-                    {/* Question number */}
-                    <div className="h-6 w-1/2 bg-gray-300 rounded"></div>{" "}
-                    {/* Question text */}
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="h-4 w-1/4 bg-yellow-200 rounded"></div>{" "}
-                    {/* Your Answer label */}
-                    <div className="h-6 w-full bg-gray-200 rounded"></div>{" "}
-                    {/* Placeholder for Your Answer */}
-                  </div>
-
-                  <div className="space-y-4 mt-2">
-                    <div className="h-4 w-1/4 bg-green-200 rounded"></div>{" "}
-                    {/* Ideal Answer label */}
-                    <div className="h-6 w-full bg-gray-200 rounded"></div>{" "}
-                    {/* Placeholder for Ideal Answer */}
-                  </div>
-
-                  <div className="space-y-4 mt-2">
-                    <div className="h-4 w-1/4 bg-blue-200 rounded"></div>{" "}
-                    {/* Ideal Answer label */}
-                    <div className="h-6 w-full bg-gray-200 rounded"></div>{" "}
-                    {/* Placeholder for Ideal Answer */}
-                  </div>
-                </Card>
-              </div>
-            ))}
-          </>
-        )}
+        {submitted && evaluationLoading && <EvaluationLoader />}
 
         {submitted && !evaluationLoading && evaluationError && (
-          <div className="max-w-3xl mx-auto pt-16">
-            <Card className="p-6 min-h-96 flex flex-col justify-center items-center">
-              <h1 className="text-2xl font-bold text-center text-destructive">
-                Error evaluating answers
-              </h1>
-              <p className="text-center text-muted-foreground">
-                {evaluationError}
-              </p>
-              <div className="flex justify-center mt-4 gap-3">
-                <Button
-                  className="flex items-center gap-2"
-                  onClick={() => redirect("/")}
-                >
-                  <House className="h-4 w-4" />
-                  Home
-                </Button>
-              </div>
-            </Card>
-          </div>
+          <EvaluationError evaluationError={evaluationError} />
         )}
 
         {submitted && !evaluationLoading && !evaluationError && (
