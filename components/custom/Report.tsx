@@ -1,11 +1,13 @@
 "use client";
 
-import { Questions } from "@/types";
-import { Badge } from "../ui/badge";
-import { Card } from "../ui/card";
 import { useInterview } from "@/context/interview-provider";
 import { useToast } from "@/hooks/use-toast";
+import { Questions } from "@/types";
+import { Mail, RefreshCcw } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
 
 export default function Report({
   evaluatedAnswers,
@@ -108,19 +110,21 @@ export default function Report({
       ))}
 
       <div className="flex justify-center mt-8 gap-4 flex-wrap">
-        <button
+        <Button
           onClick={handleEmailReport}
-          className="bg-primary-foreground text-white py-2 px-4 rounded-md"
+          className="flex items-center gap-2"
           disabled={emailSending}
         >
+          <Mail className="h-4 w-4" />
           {emailSending ? "Sending Email..." : "Email Report"}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleMoreQuestions}
-          className="bg-primary-foreground text-white py-2 px-4 rounded-md"
+          className="flex items-center gap-2"
         >
+          <RefreshCcw className="h-4 w-4" />
           More Questions
-        </button>
+        </Button>
       </div>
     </>
   );

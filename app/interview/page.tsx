@@ -25,7 +25,7 @@ import {
   Mic,
   MicOff,
   RotateCcw,
-  Send,
+  SendHorizontal,
   SquareArrowRight,
 } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -85,11 +85,7 @@ export default function InterviewPage() {
   };
 
   const handleMoreQuestions = () => {
-    setSubmitted(false);
-    setAllQuestions([]);
-    setEvaluatedAnswers([]);
-    setCurrentQuestion(1);
-    refetch();
+    redirect("/skills");
   };
 
   useSpeechRecognition({
@@ -246,12 +242,15 @@ export default function InterviewPage() {
                   {currentQuestion === allQuestions.length && (
                     <Button
                       variant="secondary"
-                      onClick={handleSubmit || evaluationLoading}
+                      onClick={handleSubmit}
                       className="flex items-center gap-2"
-                      disabled={!allQuestions[currentQuestion - 1].answer}
+                      disabled={
+                        !allQuestions[currentQuestion - 1].answer ||
+                        evaluationLoading
+                      }
                     >
                       Submit Answer
-                      <Send className="h-4 w-4" />
+                      <SendHorizontal className="h-4 w-4" />
                     </Button>
                   )}
                 </div>
