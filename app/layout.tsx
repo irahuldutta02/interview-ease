@@ -1,5 +1,6 @@
 import HomeButton from "@/components/custom/HomeButton";
 import { ModeToggle } from "@/components/custom/ModeToggle";
+import { Toaster } from "@/components/ui/toaster";
 import { InterviewProvider } from "@/context/interview-provider";
 import { ThemeProvider } from "@/context/theme-provider";
 import type { Metadata } from "next";
@@ -35,6 +36,7 @@ export default function RootLayout({
               <ModeToggle />
             </div>
             {children}
+            <Toaster />
           </InterviewProvider>
         </ThemeProvider>
       </body>

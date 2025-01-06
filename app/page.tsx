@@ -1,13 +1,38 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useInterview } from "@/context/interview-provider";
+import { useToast } from "@/hooks/use-toast";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default function Home() {
   const { name, setName, email, setEmail } = useInterview();
+
+  const { toast } = useToast();
+
+  const handleNext = () => {
+    if (name && email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailRegex.test(email)) {
+        redirect("/skills");
+      } else {
+        toast({
+          title: "Invalid Email",
+          description: "Please enter a valid email address.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Missing Details",
+        description: "Please enter your name and email.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary">
@@ -47,16 +72,9 @@ export default function Home() {
             />
           </div>
 
-          <Link
-            href={name && email ? "/skills" : "#"}
-            className={`inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground transition-colors ${
-              name && email
-                ? "hover:bg-primary/90"
-                : "opacity-50 cursor-not-allowed"
-            }`}
-          >
+          <Button onClick={handleNext} disabled={!name || !email}>
             Start Interview <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
+          </Button>
         </div>
       </div>
     </main>

@@ -1,5 +1,6 @@
 import { SendReportEmailTemplate } from "@/components/email/send-report-email-template";
 import { Resend } from "resend";
+import moment from "moment-timezone";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -9,21 +10,13 @@ export async function POST(req: Request) {
     const { name, email, evaluatedAnswers } = body;
 
     const getDataTimeFormatted = () => {
-      const date = new Date();
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      const ampm = hours >= 12 ? "PM" : "AM";
-      const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
-      return formattedDate;
+      return moment().tz("Asia/Kolkata").format("DD-MM-YYYY hh:mm A");
     };
 
     const { data, error } = await resend.emails.send({
       from: "InterviewEase <onboarding@resend.dev>",
       to: [email],
-      subject: `InterviewEase Evaluation Report Report on ${getDataTimeFormatted()}`,
+      subject: `InterviewEase Evaluation Report for Interview Given on ${getDataTimeFormatted()}`,
       react: await SendReportEmailTemplate({
         name,
         evaluatedAnswers,
