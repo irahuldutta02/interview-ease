@@ -8,7 +8,7 @@ interface EvaluateQuestionRequest {
 
 // Define the schema for the response from Gemini (structured response)
 const schema = {
-  description: "Evaluate the answers to the interview questions",
+  description: "Evaluate the answer to the interview questions",
   type: SchemaType.ARRAY,
   items: {
     type: SchemaType.OBJECT,
@@ -65,7 +65,7 @@ export async function POST(req: Request): Promise<Response> {
 
     // Create the dynamic prompt for Gemini
     const prompt = `
-      Evaluate the following answers to interview questions. For each question, assess the given answer based on the following criteria:
+      Evaluate the following answer to interview question. For each question, assess the given answer based on the following criteria:
       
       1. **Correctness**: Is the answer factually correct and aligned with the question asked?
       2. **Relevance**: Does the answer directly address the question, or is it off-topic?

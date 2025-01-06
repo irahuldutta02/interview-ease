@@ -57,18 +57,16 @@ export default function InterviewPage() {
 
   const handleRegenerate = () => {
     setIsRecording(false);
-    refetch();
     setCurrentQuestion(1);
+    setEvaluatedAnswers([]);
+    setAllQuestions([]);
+    refetch();
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     setIsRecording(false);
     setCurrentQuestion((prev) => prev + 1);
-  };
-
-  const handlePreviousQuestion = () => {
-    setIsRecording(false);
-    setCurrentQuestion((prev) => prev - 1);
+    await evaluateAnswers(currentQuestion);
   };
 
   const toggleRecording = () => {
@@ -78,7 +76,7 @@ export default function InterviewPage() {
   const handleSubmit = async () => {
     setIsRecording(false);
     setSubmitted(true);
-    await evaluateAnswers();
+    await evaluateAnswers(currentQuestion);
   };
 
   const handleMoreQuestions = () => {
@@ -303,24 +301,6 @@ export default function InterviewPage() {
                     </Tooltip>
                   </TooltipProvider>
 
-                  {currentQuestion > 1 && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            onClick={handlePreviousQuestion}
-                            className="flex items-center gap-2"
-                          >
-                            <SquareArrowRight className="h-4 w-4 transform rotate-180" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Previous Question</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-
                   {currentQuestion < allQuestions.length && (
                     <TooltipProvider>
                       <Tooltip>
@@ -328,7 +308,10 @@ export default function InterviewPage() {
                           <Button
                             onClick={handleNextQuestion}
                             className="flex items-center gap-2"
-                            disabled={!allQuestions[currentQuestion - 1].answer}
+                            disabled={
+                              !allQuestions[currentQuestion - 1].answer ||
+                              evaluationLoading
+                            }
                           >
                             <SquareArrowRight className="h-4 w-4" />
                           </Button>
@@ -407,13 +390,6 @@ export default function InterviewPage() {
                 {evaluationError}
               </p>
               <div className="flex justify-center mt-4 gap-3">
-                <Button
-                  className="flex items-center gap-2"
-                  onClick={() => evaluateAnswers()}
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  Retry
-                </Button>
                 <Button
                   className="flex items-center gap-2"
                   onClick={() => redirect("/")}

@@ -9,16 +9,31 @@ export const useEvaluateAnswer = (allQuestions: Questions[]) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const evaluateAnswers = async () => {
+  const evaluateAnswers = async (currentQuestionId: number) => {
     try {
       setLoading(true);
       setError(null);
 
+      const currentQuestion = allQuestions.filter(
+        (question) => question.id === currentQuestionId
+      );
+
       const res = await axios.post("/api/evaluate-answers", {
-        allQuestions,
+        allQuestions: currentQuestion,
       });
 
-      setEvaluatedAnswers(res?.data?.data);
+      const answer = res?.data?.data[0];
+      const answerId = answer?.id;
+
+      let newEvaluatedAnswers = evaluatedAnswers.filter(
+        (answer) => answer.id !== answerId
+      );
+
+      newEvaluatedAnswers = [...newEvaluatedAnswers, answer];
+
+      newEvaluatedAnswers.sort((a, b) => a.id - b.id);
+
+      setEvaluatedAnswers(newEvaluatedAnswers);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         setError(error.response?.data?.error || error.message);
