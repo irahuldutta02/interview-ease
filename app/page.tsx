@@ -13,7 +13,7 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="mb-8 flex justify-center">
+          <div className="mb-8 flex flex-col items-center">
             <Image
               src="/interview_ease_logo.png"
               alt="Interview Ease Logo"
@@ -21,6 +21,7 @@ export default function Home() {
               height={100}
               className="rounded-lg"
             />
+            <span className="mt-2 text-xl font-semibold">InterviewEase</span>
           </div>
           <h1 className="text-4xl font-bold tracking-tight mb-4">
             AI-Powered Interview Practice
