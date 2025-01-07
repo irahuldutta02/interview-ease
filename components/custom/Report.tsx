@@ -30,7 +30,7 @@ export default function Report({
         evaluatedAnswers: evaluatedAnswers,
       };
 
-      const response = await fetch("/api/send-email", {
+      const response = await fetch("/api/send-email-v2", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
